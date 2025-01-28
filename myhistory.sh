@@ -4,6 +4,7 @@
 BOLD_WHITE="\033[1;37m"
 GREEN="\033[0;32m"
 RESET="\033[0m"
+YEAR=$(date +"%Y")
 
 # ASCII sanatı (Patorjk Dancing Font 2025)
 ASCII_YEAR="
@@ -17,23 +18,28 @@ ASCII_YEAR="
                                                  |_|    |_|                 
 "
 
-# Geçmişi al
-HISTORY_FILE=~/.bash_history
-
-# En sık kullanılan komutları al
-TOP_COMMANDS=$(cat $HISTORY_FILE | awk '{print $1}' | sort | uniq -c | sort -nr | head -5)
-
-# En sık kullanılan tam komutları al (invocations)
-TOP_INVOCATIONS=$(cat $HISTORY_FILE | sort | uniq -c | sort -nr | head -5)
-
-# Toplam çalıştırılan komut sayısı
-TOTAL_COMMANDS=$(cat $HISTORY_FILE | wc -l)
+# Fish Shell kullanılıyor mu kontrol et
+if [ -f "$HOME/.local/share/fish/fish_history" ]; then
+    HISTORY_FILE="$HOME/.local/share/fish/fish_history"
+    # Fish history formatını düzleştirip sadece komutları al
+    TOP_COMMANDS=$(grep -oP "(?<=- cmd: ).*" "$HISTORY_FILE" | sort | uniq -c | sort -nr | head -5)
+    TOP_INVOCATIONS=$(grep -oP "(?<=- cmd: ).*" "$HISTORY_FILE" | sort | uniq -c | sort -nr | head -5)
+    TOTAL_COMMANDS=$(grep -c "- cmd:" "$HISTORY_FILE")
+else
+    HISTORY_FILE="$HOME/.bash_history"
+    # Bash history için analiz yap
+    TOP_COMMANDS=$(cat "$HISTORY_FILE" | awk '{print $1}' | sort | uniq -c | sort -nr | head -5)
+    TOP_INVOCATIONS=$(cat "$HISTORY_FILE" | sort | uniq -c | sort -nr | head -5)
+    TOTAL_COMMANDS=$(cat "$HISTORY_FILE" | wc -l)
+fi
 
 # Çıktıyı temizle
 clear
 
 # Başlık
-echo -e "${BOLD_WHITE}2025${RESET}"
+echo -e "${BOLD_WHITE}"
+echo -e "$YEAR"
+echo -e "${RESET}"
 echo -e "$ASCII_YEAR"
 
 # Başlıkları yazdır
