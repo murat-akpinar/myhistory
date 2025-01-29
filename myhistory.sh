@@ -19,16 +19,16 @@ ASCII_YEAR="
 # Fish Shell kullanılıyor mu kontrol et
 if [ -f "$HOME/.local/share/fish/fish_history" ]; then
     HISTORY_FILE="$HOME/.local/share/fish/fish_history"
-    # Fish history formatını düzleştirip sadece komutları al
-    TOP_COMMANDS=$(grep -oP "(?<=- cmd: ).*" "$HISTORY_FILE" | sort | uniq -c | sort -nr | head -5)
-    TOP_INVOCATIONS=$(grep -oP "(?<=- cmd: ).*" "$HISTORY_FILE" | sort | uniq -c | sort -nr | head -5)
-    TOTAL_COMMANDS=$(grep -c "- cmd:" "$HISTORY_FILE")
+    # Fish history dosyasında sadece komutları çek
+    TOP_COMMANDS=$(awk -F': ' '/- cmd:/ {print $2}' "$HISTORY_FILE" | sort | uniq -c | sort -nr | head -5)
+    TOP_INVOCATIONS="$TOP_COMMANDS"
+    TOTAL_COMMANDS=$(awk -F': ' '/- cmd:/ {count++} END {print count}' "$HISTORY_FILE")
 else
     HISTORY_FILE="$HOME/.bash_history"
     # Bash history için analiz yap
-    TOP_COMMANDS=$(cat "$HISTORY_FILE" | awk '{print $1}' | sort | uniq -c | sort -nr | head -5)
-    TOP_INVOCATIONS=$(cat "$HISTORY_FILE" | sort | uniq -c | sort -nr | head -5)
-    TOTAL_COMMANDS=$(cat "$HISTORY_FILE" | wc -l)
+    TOP_COMMANDS=$(awk '{print $1}' "$HISTORY_FILE" | sort | uniq -c | sort -nr | head -5)
+    TOP_INVOCATIONS=$(sort "$HISTORY_FILE" | uniq -c | sort -nr | head -5)
+    TOTAL_COMMANDS=$(wc -l < "$HISTORY_FILE")
 fi
 
 # Çıktıyı temizle
@@ -46,11 +46,13 @@ printf "%-20s %-30s\n" "----------------" "----------------"
 
 # İlk 5 komutu ve invocation'ı yan yana yazdır
 for i in {1..5}; do
-    CMD=$(echo "$TOP_COMMANDS" | sed -n "${i}p" | awk '{print $2}')
-    INVOC=$(echo "$TOP_INVOCATIONS" | sed -n "${i}p" | awk '{print substr($0, index($0,$2))}')
+    CMD=$(echo "$TOP_COMMANDS" | sed -n "${i}p" | awk '{$1=""; print $0}')
+    INVOC=$(echo "$TOP_INVOCATIONS" | sed -n "${i}p" | awk '{$1=""; print $0}')
     printf "${GREEN}%-2s.${RESET} %-17s ${GREEN}%-2s.${RESET} %-30s\n" "$i" "$CMD" "$i" "$INVOC"
 done
 
 # Toplam çalıştırılan komutları göster
 echo -e "\n${BOLD_WHITE}Commands Ran${RESET}"
 echo -e "${GREEN}${TOTAL_COMMANDS}${RESET}"
+
+
