@@ -36,7 +36,7 @@ clear
 
 # Başlık
 echo -e "${BOLD_WHITE}"
-echo -e "$YEAR"
+echo -e "\e#3$YEAR"
 echo -e "${RESET}"
 echo -e "$ASCII_YEAR"
 
@@ -52,7 +52,9 @@ for i in {1..5}; do
 done
 
 # Toplam çalıştırılan komutları göster
-echo -e "\n${BOLD_WHITE}Commands Ran${RESET}"
-echo -e "${GREEN}${TOTAL_COMMANDS}${RESET}"
-
+echo -e " "
+echo -e "\e#3${BOLD_WHITE}Commands Ran${RESET}"
+echo -e " "
+echo -e "\e#3${GREEN}${TOTAL_COMMANDS}${RESET}"
+echo -e " "
 
