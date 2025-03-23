@@ -19,10 +19,10 @@ ASCII_YEAR="
 # Fish Shell kullanılıyor mu kontrol et
 if [ -f "$HOME/.local/share/fish/fish_history" ]; then
     HISTORY_FILE="$HOME/.local/share/fish/fish_history"
-    # Fish history dosyasında sadece komutları çek
-    TOP_COMMANDS=$(awk -F': ' '/- cmd:/ {print $2}' "$HISTORY_FILE" | sort | uniq -c | sort -nr | head -5)
-    TOP_INVOCATIONS="$TOP_COMMANDS"
-    TOTAL_COMMANDS=$(awk -F': ' '/- cmd:/ {count++} END {print count}' "$HISTORY_FILE")
+# Fish history dosyasında sadece komutları çek
+TOP_COMMANDS=$(grep '^- cmd:' "$HISTORY_FILE" | sed 's/^- cmd: //' | awk '{print $1}' | sort | uniq -c | sort -nr | head -5)
+TOP_INVOCATIONS=$(grep '^- cmd:' "$HISTORY_FILE" | sed 's/^- cmd: //' | sort | uniq -c | sort -nr | head -5)
+TOTAL_COMMANDS=$(grep '^- cmd:' "$HISTORY_FILE" | wc -l)
 else
     HISTORY_FILE="$HOME/.bash_history"
     # Bash history için analiz yap
